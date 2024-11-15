@@ -1,10 +1,10 @@
-package com.example0;
+package com.example.user_profile_information_store;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ApplicationTests {
+class UserProfileInformationStoreApplicationTests {
 
 	@Test
 	void contextLoads() {
