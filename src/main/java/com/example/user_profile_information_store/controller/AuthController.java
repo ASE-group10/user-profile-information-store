@@ -7,6 +7,10 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+
+import com.example.user_profile_information_store.service.Auth0TokenService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,8 +32,12 @@ public class AuthController {
 
     @Value("${auth0.logout.return-url}")
     private String logoutReturnUrl;
-
+    private final Auth0TokenService tokenService;
     private final RestTemplate restTemplate = new RestTemplate();
+
+    public AuthController(Auth0TokenService tokenService) {
+        this.tokenService = tokenService;
+    }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
@@ -51,9 +59,26 @@ public class AuthController {
             ResponseEntity<Map> response = restTemplate.postForEntity(url, new HttpEntity<>(request, headers), Map.class);
             return ResponseEntity.ok(response.getBody());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Invalid credentials: " + e.getMessage());
+            String errorMessage;
+            if (e instanceof org.springframework.web.client.HttpClientErrorException) {
+                var ex = (org.springframework.web.client.HttpClientErrorException) e;
+                errorMessage = ex.getResponseBodyAsString();
+                try {
+                    Map<String, Object> errorResponse = new ObjectMapper().readValue(errorMessage, new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {});
+                    errorMessage = (String) errorResponse.get("error_description"); // Extract detailed error
+                } catch (Exception parseEx) {
+                    errorMessage = ex.getStatusCode() + ": " + ex.getResponseBodyAsString();
+                }
+            } else {
+                errorMessage = "Login failed: " + e.getMessage();
+            }
+
+            return ResponseEntity.status(401).body(Map.of(
+                "error", errorMessage
+            ));
         }
     }
+
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody Map<String, String> userDetails) {
@@ -65,16 +90,36 @@ public class AuthController {
         request.put("connection", "Username-Password-Authentication");
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + managementApiToken);
+        headers.set("Authorization", "Bearer " + tokenService.getManagementApiToken());
         headers.set("Content-Type", "application/json");
 
         try {
             ResponseEntity<Map> response = restTemplate.postForEntity(url, new HttpEntity<>(request, headers), Map.class);
             return ResponseEntity.ok(response.getBody());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Signup failed: " + e.getMessage());
+            // Extract detailed error message if present in the response body
+            String errorMessage;
+            if (e instanceof org.springframework.web.client.HttpClientErrorException) {
+                var ex = (org.springframework.web.client.HttpClientErrorException) e;
+                errorMessage = ex.getResponseBodyAsString(); // Raw response body
+                try {
+                    // Parse the response body for specific error message
+                    Map<String, Object> errorResponse = new ObjectMapper().readValue(errorMessage, new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {});
+                    errorMessage = (String) errorResponse.get("message"); // Extract "message" field
+                } catch (Exception parseEx) {
+                    // If parsing fails, fallback to the raw response
+                    errorMessage = ex.getStatusCode() + ": " + ex.getResponseBodyAsString();
+                }
+            } else {
+                errorMessage = "Signup failed: " + e.getMessage();
+            }
+
+            return ResponseEntity.badRequest().body(Map.of(
+                "error", errorMessage
+            ));
         }
     }
+
 
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> requestBody) {
@@ -90,9 +135,29 @@ public class AuthController {
 
         try {
             restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(request, headers), String.class);
-            return ResponseEntity.ok("Password reset email sent to " + requestBody.get("email"));
+            return ResponseEntity.ok(Map.of(
+                "message", "Password reset email sent to " + requestBody.get("email")
+            ));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Failed to send password reset email: " + e.getMessage());
+            String errorMessage;
+            if (e instanceof org.springframework.web.client.HttpClientErrorException) {
+                var ex = (org.springframework.web.client.HttpClientErrorException) e;
+                errorMessage = ex.getResponseBodyAsString();
+                try {
+                    // Attempt to parse error response for meaningful details
+                    Map<String, Object> errorResponse = new ObjectMapper().readValue(errorMessage, new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {});
+                    errorMessage = (String) errorResponse.get("message");
+                } catch (Exception parseEx) {
+                    // Fallback to raw response
+                    errorMessage = ex.getStatusCode() + ": " + ex.getResponseBodyAsString();
+                }
+            } else {
+                errorMessage = "Failed to send password reset email: " + e.getMessage();
+            }
+
+            return ResponseEntity.status(400).body(Map.of(
+                "error", errorMessage
+            ));
         }
     }
 
@@ -103,18 +168,29 @@ public class AuthController {
                     "?client_id=" + clientId +
                     "&returnTo=" + logoutReturnUrl;
 
-            RestTemplate restTemplate = new RestTemplate();
             restTemplate.getForEntity(logoutUrl, String.class);
 
             Map<String, String> response = new HashMap<>();
             response.put("message", "Logout successful");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            String errorMessage;
+            if (e instanceof org.springframework.web.client.HttpClientErrorException) {
+                var ex = (org.springframework.web.client.HttpClientErrorException) e;
+                errorMessage = ex.getResponseBodyAsString();
+                try {
+                    Map<String, Object> errorResponse = new ObjectMapper().readValue(errorMessage, HashMap.class);
+                    errorMessage = (String) errorResponse.get("message");
+                } catch (Exception parseEx) {
+                    errorMessage = ex.getStatusCode() + ": " + ex.getResponseBodyAsString();
+                }
+            } else {
+                errorMessage = "Logout failed: " + e.getMessage();
+            }
+
             return ResponseEntity.status(500).body(Map.of(
-                "message", "Logout failed",
-                "error", e.getMessage()
+                "error", errorMessage
             ));
         }
     }
-
 }
