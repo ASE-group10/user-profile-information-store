@@ -77,13 +77,14 @@ public class AuthController {
             User user = userService.findByEmail(credentials.get("email"));
             if (user == null) {
                 return ResponseEntity.status(401).body(Map.of(
-                    "error", "User not found in the local database",
+                    "message", "Login failed: User not found in the local database",
                     "auth0Response", responseBody
                 ));
             }
 
-            // Return the token and auth0_user_id
+            // Return success response with token and user details
             return ResponseEntity.status(statusCode).body(Map.of(
+                "message", "Login successful",
                 "token", responseBody.get("access_token"),
                 "auth0_user_id", user.getAuth0UserId(),
                 "expires_in", responseBody.get("expires_in"),
@@ -103,19 +104,44 @@ public class AuthController {
                 errorDetails = Map.of("rawError", errorBody); // Fallback to raw string if parsing fails
             }
 
-            // Return error response
+            // Return detailed error response as a clean JSON object
             return ResponseEntity.status(errorStatusCode).body(Map.of(
-                "error", "Login failed",
+                "message", "Login failed: Authentication error",
                 "details", errorDetails
             ));
         } catch (Exception e) {
             // Handle unexpected errors
+            String errorBody = e.getMessage();
+            Map<String, Object> errorDetails;
+
+            try {
+                // Clean and parse the error message if it's JSON
+                if (errorBody.contains("{") && errorBody.contains("}")) {
+                    int startIndex = errorBody.indexOf("{");
+                    int endIndex = errorBody.lastIndexOf("}") + 1;
+                    String jsonSubstring = errorBody.substring(startIndex, endIndex);
+
+                    // Parse the JSON substring
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    errorDetails = objectMapper.readValue(jsonSubstring, new TypeReference<Map<String, Object>>() {});
+                } else {
+                    errorDetails = Map.of("rawError", errorBody);
+                }
+            } catch (Exception parseException) {
+                // Fallback to raw error if parsing fails
+                errorDetails = Map.of("rawError", errorBody);
+            }
+
+            // Return a better-formatted response
             return ResponseEntity.status(500).body(Map.of(
-                "error", "An unexpected error occurred during login",
-                "details", e.getMessage()
+                "message", "Login failed: An unexpected error occurred",
+                "details", errorDetails
             ));
         }
     }
+
+
+
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody Map<String, String> userDetails) {
