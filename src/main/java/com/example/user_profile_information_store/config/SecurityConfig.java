@@ -5,49 +5,51 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 
 @Configuration
 public class SecurityConfig {
 
-    @Value("${auth0.logout.return-url}")
-    private String logoutReturnUrl;
+    @Value("${auth0.audience}")
+    private String audience;
 
-    @Value("${spring.security.oauth2.client.registration.auth0.client-id}")
-    private String clientId;
+    @Value("${auth0.domain}")
+    private String issuer;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.ignoringRequestMatchers(
-                "/api/login", "/api/signup", "/api/forgot-password", "/api/logout"
+                "/api/login",
+                "/api/signup",
+                "/api/forgot-password",
+                "/api/logout",
+                "/api/users/**",
+                "/api/routes/**"
             ))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                    "/", 
-                    "/api/login", 
-                    "/api/signup", 
-                    "/api/forgot-password", 
-                    "/api/logout", 
+                    "/",
+                    "/api/login",
+                    "/api/signup",
+                    "/api/forgot-password",
+                    "/api/logout",
                     "/error"
                 ).permitAll()
                 .anyRequest().authenticated()
             )
-            .oauth2Login(oauth2 -> oauth2
-                .loginPage("/oauth2/authorization/auth0")
-                .defaultSuccessUrl("/", true)
-                .failureUrl("/error")
-            )
-            .logout(logout -> logout
-                .logoutUrl("/api/logout")
-                .logoutSuccessHandler((request, response, authentication) -> {
-                    String auth0LogoutUrl = "https://test-auth0-domain.com/v2/logout" +
-                        "?client_id=" + clientId +
-                        "&returnTo=" + logoutReturnUrl;
-                    response.sendRedirect(auth0LogoutUrl);
-                })
-                .invalidateHttpSession(true)
-                .clearAuthentication(true)
+            .oauth2ResourceServer(oauth2 -> oauth2
+                .jwt(jwt -> jwt
+                    .decoder(jwtDecoder())
+                )
             );
         return http.build();
+    }
+
+    @Bean
+    public JwtDecoder jwtDecoder() {
+        String jwkSetUri = issuer + "/.well-known/jwks.json";
+        return NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build();
     }
 }
