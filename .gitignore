@@ -1,36 +1,57 @@
+# ========================
+# General Files
+# ========================
 HELP.md
 target/
-!.mvn/wrapper/maven-wrapper.jar
+build/
+.vscode/
+
+# Exclude specific target directories except those in source folders
 !**/src/main/**/target/
 !**/src/test/**/target/
+!**/src/main/**/build/
+!**/src/test/**/build/
 
-### STS ###
+# ========================
+# Environment and Secrets
+# ========================
+.env
+application.properties
+application.yml
+
+# ========================
+# IDE Specific Files
+# ========================
+
+## Spring Tool Suite (STS) ##
 .apt_generated
 .classpath
 .factorypath
 .project
-.settings
+.settings/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
+## IntelliJ IDEA ##
+.idea/
 *.iws
 *.iml
 *.ipr
 
-### NetBeans ###
+## NetBeans ##
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
 
-### VS Code ###
-.vscode/
-
-### Environment ###
-.env
+# ========================
+# Logs and Temporary Files
+# ========================
+*.log
+*.tmp
+*.bak
+*.swp
+*.lock
+.DS_Store
+Thumbs.db

@@ -35,7 +35,14 @@ public class SecurityConfig {
                     "/api/signup",
                     "/api/forgot-password",
                     "/api/logout",
-                    "/error"
+                    "/error",
+                    "/swagger-ui/**", // Allow Swagger UI
+                    "/swagger-ui/**",   // Allow Swagger UI
+                    "/v3/api-docs/**",  // Allow API docs
+                    "/v3/api-docs.yaml", // Allow YAML docs
+                    "/swagger-ui.html", // Direct Swagger UI access
+                    "/swagger-resources/**", // Required for Springfox-style Swagger
+                    "/webjars/**" // Webjars for Swagger UI
                 ).permitAll()
                 .anyRequest().authenticated()
             )

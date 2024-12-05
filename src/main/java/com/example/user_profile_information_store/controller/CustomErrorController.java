@@ -1,5 +1,5 @@
 package com.example.user_profile_information_store.controller;
-
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorController;
@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Map;
 
+@Hidden
 @RestController
 @RequestMapping("/error")
 public class CustomErrorController implements ErrorController {

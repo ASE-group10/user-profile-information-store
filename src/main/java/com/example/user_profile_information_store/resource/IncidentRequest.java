@@ -30,12 +30,4 @@ public class IncidentRequest {
     public void setRadius(double radius) {
         this.radius = radius;
     }
-
-    public String getAuth0UserId() {
-        return auth0UserId;
-    }
-
-    public void setAuth0UserId(String auth0UserId) {
-        this.auth0UserId = auth0UserId;
-    }
 }
