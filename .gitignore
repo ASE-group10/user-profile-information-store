@@ -16,8 +16,6 @@ build/
 # Environment and Secrets
 # ========================
 .env
-application.properties
-application.yml
 
 # ========================
 # IDE Specific Files
