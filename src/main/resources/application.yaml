@@ -1,0 +1,62 @@
+spring:
+  application:
+    name: user-profile-information-store
+  security:
+    oauth2:
+      client:
+        registration:
+          auth0:
+            client-id: ${AUTH0_CLIENT_ID:YOUR_AUTH0_CLIENT_ID}
+            client-secret: ${AUTH0_CLIENT_SECRET:YOUR_AUTH0_CLIENT_SECRET}
+            scope: openid,profile,email
+            authorization-grant-type: authorization_code
+            redirect-uri: ${REDIRECT_URI:http://localhost:8080/login/oauth2/code/auth0}
+        provider:
+          auth0:
+            issuer-uri: ${SPRING_DATASOURCE_URL:https://YOUR_AUTH0_DOMAIN}
+            user-info-uri: ${SPRING_DATASOURCE_URL:https://YOUR_AUTH0_DOMAIN/userinfo}
+            jwk-set-uri: ${SPRING_DATASOURCE_URL:https://YOUR_AUTH0_DOMAIN/.well-known/jwks.json}
+            user-name-attribute: sub
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/user-profile-store}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:real-time-notification-service}
+    hikari:
+      maximum-pool-size: ${SPRING_DATASOURCE_MAXIMUM_POOL_SIZE:1}
+      pool-name: ${SPRING_DATASOURCE_POOL_NAME:HikariPool}
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    generate-ddl: true
+    hibernate:
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+    show-sql: ${SPRING_JPA_SHOW_SQL:false}
+
+
+auth0:
+  domain: ${AUTH0_DOMAIN:YOUR_AUTH0_DOMAIN}
+  audience: ${AUTH0_AUDIENCE:YOUR_AUTH0_AUDIENCE}
+  logout:
+    return-url: ${app.base-url}
+
+app:
+  base-url: ${SPRING_DATASOURCE_URL:http://localhost:${server.port}}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+pyroscope:
+  server:
+    address: ${PYROSCOPE_SERVER_ADDRESS:pyroscope:4040}
+  auth:
+    user: ${PYROSCOPE_AUTH_USER:9999999}
+    password: ${PYROSCOPE_AUTH_PASSWORD:glc_fff}
