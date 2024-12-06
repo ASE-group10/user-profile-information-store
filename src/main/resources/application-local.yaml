@@ -1,0 +1,59 @@
+spring:
+  application:
+    name: user-profile-information-store
+  security:
+    oauth2:
+      client:
+        registration:
+          auth0:
+            client-id:
+            client-secret:
+            scope: openid,profile,email
+            authorization-grant-type: authorization_code
+            redirect-uri: http://localhost:${server.port}/login/oauth2/code/auth0
+        provider:
+          auth0:
+            issuer-uri: ${auth0.domain}
+            user-info-uri: ${auth0.domain}userinfo
+            jwk-set-uri: ${auth0.domain}.well-known/jwks.json
+            user-name-attribute: sub
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/user-profile-store}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:user-profile-store}
+    hikari:
+      maximum-pool-size: ${SPRING_DATASOURCE_MAXIMUM_POOL_SIZE:1}
+      pool-name: ${SPRING_DATASOURCE_POOL_NAME:HikariPool}
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+    show-sql: ${SPRING_JPA_SHOW_SQL:false}
+
+server:
+  port: 8080
+
+auth0:
+  domain:
+  audience: http://localhost:${server.port}
+  logout:
+    return-url: ${app.base-url}
+
+app:
+  base-url: http://localhost:${server.port}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+pyroscope:
+  server:
+    address:
+  auth:
+    user:
+    password:
