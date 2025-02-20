@@ -59,13 +59,14 @@ public class AuthController {
                 schema = @Schema(type = "object"),
                 examples = @ExampleObject(
                     name = "200 OK Example",
-                    value = "{\n" +
-                            "  \"auth0_user_id\": \"auth0|675119f9afd09e003e28439b\",\n" +
-                            "  \"token_type\": \"Bearer\",\n" +
-                            "  \"expires_in\": 86400,\n" +
-                            "  \"message\": \"Login successful\",\n" +
-                            "  \"token\": \"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlRNLUVQSkd3ajJZSVY5OW0xUlJDYiJ9.eyJpc3MiOiJodHRwczovL3N1c3RhaW5hYmxlLXdheWZpbmRpbmcuZXUuYXV0aDAuY29tLyIsInN1YiI6ImF1dGgwfDY3NTExOWY5YWZkMDllMDAzZTI4NDM5YiIsImF1ZCI6Imh0dHBzOi8vc3VzdGFpbmFibGUtd2F5ZmluZGluZy5ldS5hdXRoMC5jb20vYXBpL3YyLyIsImlhdCI6MTczMzM2ODM4OCwiZXhwIjoxNzMzNDU0Nzg4LCJzY29wZSI6InJlYWQ6Y3VycmVudF91c2VyIHVwZGF0ZTpjdXJyZW50X3VzZXJfbWV0YWRhdGEgZGVsZXRlOmN1cnJlbnRfdXNlcl9tZXRhZGF0YSBjcmVhdGU6Y3VycmVudF91c2VyX21ldGFkYXRhIGNyZWF0ZTpjdXJyZW50X3VzZXJfZGV2aWNlX2NyZWRlbnRpYWxzIGRlbGV0ZTpjdXJyZW50X3VzZXJfZGV2aWNlX2NyZWRlbnRpYWxzIHVwZGF0ZTpjdXJyZW50X3VzZXJfaWRlbnRpdGllcyIsImd0eSI6InBhc3N3b3JkIiwiYXpwIjoiOFdlSUZYbXNvZlhxTUYyYVNvN0RUNGROdW04RjBDRmMifQ.q0DMrlv9p_pCWKCq8Y8v0mfdILbu9hwTx-Dt1eIdyDavgnhDGDExp09j1Kb4vnlbMMege1jwLpxlwRHHuA5ySGPCh_HHYV9tBXAlBXmPsRaRDcyka-mRnYmh8OHXhkWL2W-0i6B-gvyCVVwUW49NFQiSOMhtOkCxRV0gwKX2GKwGJqr9iC6Xb-RDaIiPmCVO5nvd8TzSFd89HBTgC9PBneGJPjXBD1yuv09PfyQ2bJ65S4SFCMYnS7FhzWeLw2KEhZVSfdYl9OWC_FeD5hUSxCTO0teLibpqJoeU0k5BFCDvSLSDJFQ7MCbkj5W4vXM5QV9KhMkl9cfM8yEg-dugNQ\"\n" +
-                            "}"
+                    value = """
+                            {
+                              "auth0_user_id": "auth0|675119f9afd09e003e28439b",
+                              "token_type": "Bearer",
+                              "expires_in": 86400,
+                              "message": "Login successful",
+                              "token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlRNLUVQSkd3ajJZSVY5OW0xUlJDYiJ9.eyJpc3MiOiJodHRwczovL3N1c3RhaW5hYmxlLXdheWZpbmRpbmcuZXUuYXV0aDAuY29tLyIsInN1YiI6ImF1dGgwfDY3NTExOWY5YWZkMDllMDAzZTI4NDM5YiIsImF1ZCI6Imh0dHBzOi8vc3VzdGFpbmFibGUtd2F5ZmluZGluZy5ldS5hdXRoMC5jb20vYXBpL3YyLyIsImlhdCI6MTczMzM2ODM4OCwiZXhwIjoxNzMzNDU0Nzg4LCJzY29wZSI6InJlYWQ6Y3VycmVudF91c2VyIHVwZGF0ZTpjdXJyZW50X3VzZXJfbWV0YWRhdGEgZGVsZXRlOmN1cnJlbnRfdXNlcl9tZXRhZGF0YSBjcmVhdGU6Y3VycmVudF91c2VyX21ldGFkYXRhIGNyZWF0ZTpjdXJyZW50X3VzZXJfZGV2aWNlX2NyZWRlbnRpYWxzIGRlbGV0ZTpjdXJyZW50X3VzZXJfZGV2aWNlX2NyZWRlbnRpYWxzIHVwZGF0ZTpjdXJyZW50X3VzZXJfaWRlbnRpdGllcyIsImd0eSI6InBhc3N3b3JkIiwiYXpwIjoiOFdlSUZYbXNvZlhxTUYyYVNvN0RUNGROdW04RjBDRmMifQ.q0DMrlv9p_pCWKCq8Y8v0mfdILbu9hwTx-Dt1eIdyDavgnhDGDExp09j1Kb4vnlbMMege1jwLpxlwRHHuA5ySGPCh_HHYV9tBXAlBXmPsRaRDcyka-mRnYmh8OHXhkWL2W-0i6B-gvyCVVwUW49NFQiSOMhtOkCxRV0gwKX2GKwGJqr9iC6Xb-RDaIiPmCVO5nvd8TzSFd89HBTgC9PBneGJPjXBD1yuv09PfyQ2bJ65S4SFCMYnS7FhzWeLw2KEhZVSfdYl9OWC_FeD5hUSxCTO0teLibpqJoeU0k5BFCDvSLSDJFQ7MCbkj5W4vXM5QV9KhMkl9cfM8yEg-dugNQ"
+                            }"""
                 )
             )
         ),
@@ -77,13 +78,14 @@ public class AuthController {
                 schema = @Schema(type = "object"),
                 examples = @ExampleObject(
                     name = "500 Internal Server Error Example",
-                    value = "{\n" +
-                            "  \"message\": \"Login failed: An unexpected error occurred\",\n" +
-                            "  \"details\": {\n" +
-                            "    \"error\": \"access_denied\",\n" +
-                            "    \"error_description\": \"Please verify your email address before logging in.\"\n" +
-                            "  }\n" +
-                            "}"
+                    value = """
+                            {
+                              "message": "Login failed: An unexpected error occurred",
+                              "details": {
+                                "error": "access_denied",
+                                "error_description": "Please verify your email address before logging in."
+                              }
+                            }"""
                 )
             )
         ),
@@ -95,13 +97,14 @@ public class AuthController {
                 schema = @Schema(type = "object"),
                 examples = @ExampleObject(
                     name = "403 Forbidden Example",
-                    value = "{\n" +
-                            "  \"message\": \"Login failed: Authentication error\",\n" +
-                            "  \"details\": {\n" +
-                            "    \"error\": \"invalid_grant\",\n" +
-                            "    \"error_description\": \"Wrong email or password.\"\n" +
-                            "  }\n" +
-                            "}"
+                    value = """
+                            {
+                              "message": "Login failed: Authentication error",
+                              "details": {
+                                "error": "invalid_grant",
+                                "error_description": "Wrong email or password."
+                              }
+                            }"""
                 )
             )
         )
@@ -116,10 +119,11 @@ public class AuthController {
                 schema = @Schema(type = "object"),
                 examples = @ExampleObject(
                     name = "Login Request Example",
-                    value = "{\n" +
-                            "  \"email\": \"john.doe@mail.com\",\n" +
-                            "  \"password\": \"Password@123\"\n" +
-                            "}"
+                    value = """
+                            {
+                              "email": "john.doe@mail.com",
+                              "password": "Password@123"
+                            }"""
                 )
             )
         )
@@ -148,13 +152,21 @@ public class AuthController {
             ObjectMapper objectMapper = new ObjectMapper();
             Map<String, Object> responseBody = objectMapper.convertValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
 
+            String auth0UserId = (String) responseBody.get("auth0_user_id");
+            String email = credentials.get("email");
+
             // Check if the user exists in the local database
-            User user = userService.findByEmail(credentials.get("email"));
+            User user = userService.findByEmail(email);
             if (user == null) {
-                return ResponseEntity.status(401).body(Map.of(
-                    "message", "Login failed: User not found in the local database",
-                    "auth0Response", responseBody
-                ));
+                // Create a new user record in the database
+                user = new User();
+                user.setAuth0UserId(auth0UserId);
+                user.setEmail(email);
+                user.setName(email); // Use email as the default name if no other info is available
+                user.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+
+                // Save the new user to the database
+                userService.save(user);
             }
 
             // Return success response with token and user details
@@ -186,31 +198,9 @@ public class AuthController {
             ));
         } catch (Exception e) {
             // Handle unexpected errors
-            String errorBody = e.getMessage();
-            Map<String, Object> errorDetails;
-
-            try {
-                // Clean and parse the error message if it's JSON
-                if (errorBody.contains("{") && errorBody.contains("}")) {
-                    int startIndex = errorBody.indexOf("{");
-                    int endIndex = errorBody.lastIndexOf("}") + 1;
-                    String jsonSubstring = errorBody.substring(startIndex, endIndex);
-
-                    // Parse the JSON substring
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    errorDetails = objectMapper.readValue(jsonSubstring, new TypeReference<Map<String, Object>>() {});
-                } else {
-                    errorDetails = Map.of("rawError", errorBody);
-                }
-            } catch (Exception parseException) {
-                // Fallback to raw error if parsing fails
-                errorDetails = Map.of("rawError", errorBody);
-            }
-
-            // Return a better-formatted response
             return ResponseEntity.status(500).body(Map.of(
                 "message", "Login failed: An unexpected error occurred",
-                "details", errorDetails
+                "details", e.getMessage()
             ));
         }
     }
