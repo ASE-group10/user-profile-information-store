@@ -57,7 +57,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        String jwkSetUri = "https://" + issuer + ".well-known/jwks.json";
+        String jwkSetUri = issuer + ".well-known/jwks.json";
         return NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build();
     }
 }
