@@ -285,7 +285,7 @@ public class AuthController {
         )
     )    
     @RequestBody Map<String, String> userDetails) {
-        String url = auth0Domain + "/api/v2/users";
+        String url = auth0Domain + "api/v2/users";
 
         // Prepare the request payload
         Map<String, Object> request = new HashMap<>();
@@ -438,7 +438,7 @@ public class AuthController {
             )
         )
         @RequestBody Map<String, String> requestBody) {
-        String url = auth0Domain + "/dbconnections/change_password";
+        String url = auth0Domain + "dbconnections/change_password";
 
         Map<String, Object> request = new HashMap<>();
         request.put("client_id", clientId);
@@ -533,9 +533,8 @@ public class AuthController {
     })
     @GetMapping("/logout")
     public ResponseEntity<?> logout() {
-        String logoutUrl = auth0Domain + "/v2/logout" +
-                "?client_id=" + clientId +
-                "&returnTo=" + logoutReturnUrl;
+        String logoutUrl = auth0Domain + "v2/logout" +
+                "?client_id=" + clientId;
 
         try {
             // Send the request to Auth0
