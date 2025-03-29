@@ -56,7 +56,7 @@ springdoc:
 
 pyroscope:
   server:
-    address:
+    address: ${PYROSCOPE_SERVER_ADDRESS:http://pyroscope:4040}
   auth:
-    user:
-    password:
+    user: ${PYROSCOPE_AUTH_USER:admin}
+    password: ${PYROSCOPE_AUTH_PASSWORD:admin123}
