@@ -46,7 +46,7 @@ auth0:
     return-url: ${app.base-url}
 
 app:
-  base-url: ${USER_SERVICE_URL:http://localhost:8080}
+  base-url: ${USER_SERVICE_URL:http://localhost:8084}
 
 springdoc:
   swagger-ui:

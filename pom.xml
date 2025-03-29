@@ -88,10 +88,12 @@
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
         </dependency>
+
         <dependency>
             <groupId>com.auth0</groupId>
             <artifactId>jwks-rsa</artifactId>
@@ -116,6 +118,28 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <!-- AWS SDK for Secrets Manager -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>secretsmanager</artifactId>
+            <version>2.21.9</version>
+        </dependency>
+
+        <!-- AWS SDK Auth (required for credentials + region) -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>auth</artifactId>
+            <version>2.21.9</version>
+        </dependency>
+
+        <!-- Jackson JSON for parsing secret values -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.15.3</version>
+        </dependency>
+
     </dependencies>
 
     <build>
