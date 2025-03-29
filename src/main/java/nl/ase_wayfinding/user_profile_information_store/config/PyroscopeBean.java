@@ -33,10 +33,10 @@ public class PyroscopeBean {
     @PostConstruct
     public void init() {
 
-        if (activeProfile.equals("local") || pyroscopeServerAuthUser.isEmpty() || pyroscopeServerAuthPassword.isEmpty()) {
-            System.out.println("Pyroscope is disabled in local profile");
-            return;
-        }
+//        if (activeProfile.equals("local") || pyroscopeServerAuthUser.isEmpty() || pyroscopeServerAuthPassword.isEmpty()) {
+//            System.out.println("Pyroscope is disabled in local profile");
+//            return;
+//        }
 
         PyroscopeAgent.start(
                 new Config.Builder()

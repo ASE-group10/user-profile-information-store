@@ -13,13 +13,13 @@ spring:
             redirect-uri: "${USER_SERVICE_URL}/login/oauth2/code/auth0"
         provider:
           auth0:
-            issuer-uri: "${AUTH0_DOMAIN}/"
+            issuer-uri: "${AUTH0_DOMAIN}"
             user-info-uri: "${AUTH0_DOMAIN}/userinfo"
             jwk-set-uri: "${AUTH0_DOMAIN}/.well-known/jwks.json"
             user-name-attribute: sub
   config:
     activate:
-      on-profile: local
+      on-profile: dev
   datasource:
     driver-class-name: org.postgresql.Driver
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/user-profile-store}
@@ -46,7 +46,7 @@ auth0:
     return-url: ${app.base-url}
 
 app:
-  base-url: ${USER_SERVICE_URL:http://localhost:8080}
+  base-url: ${USER_SERVICE_URL:http://localhost:8084}
 
 springdoc:
   swagger-ui:
@@ -56,7 +56,7 @@ springdoc:
 
 pyroscope:
   server:
-    address: ${PYROSCOPE_SERVER_ADDRESS:pyroscope:4040}
+    address: ${PYROSCOPE_SERVER_ADDRESS}
   auth:
-    user: ${PYROSCOPE_AUTH_USER:9999999}
-    password: ${PYROSCOPE_AUTH_PASSWORD:glc_fff}
+    user: ${PYROSCOPE_AUTH_USER}
+    password: ${PYROSCOPE_AUTH_PASSWORD}
