@@ -1,8 +1,13 @@
 package nl.ase_wayfinding.user_profile_information_store.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.sql.Timestamp;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "users")
 public class User {
@@ -24,57 +29,4 @@ public class User {
     @Column(name = "created_at")
     private Timestamp createdAt;
 
-    // Constructors
-    public User() {}
-
-    // Getters and Setters
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getAuth0UserId() {
-        return auth0UserId;
-    }
-
-    public void setAuth0UserId(String auth0UserId) {
-        this.auth0UserId = auth0UserId;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-    
-    public void setEmail(String email) {
-        this.email = email;
-    }
-    
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    
-    public String getPicture() {
-        return picture;
-    }
-    
-    public void setPicture(String picture) {
-        this.picture = picture;
-    }
-    
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
-    
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
-    }
 }
