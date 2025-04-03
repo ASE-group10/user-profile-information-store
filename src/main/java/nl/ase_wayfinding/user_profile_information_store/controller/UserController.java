@@ -1,5 +1,8 @@
 package nl.ase_wayfinding.user_profile_information_store.controller;
 
+import nl.ase_wayfinding.user_profile_information_store.dto.AccountUpdateRequest;
+import nl.ase_wayfinding.user_profile_information_store.dto.PreferencesUpdateRequest;
+import nl.ase_wayfinding.user_profile_information_store.model.Preferences;
 import nl.ase_wayfinding.user_profile_information_store.model.RoutePreference;
 import nl.ase_wayfinding.user_profile_information_store.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -93,7 +96,7 @@ public class UserController {
         try {
             String auth0UserId = jwt.getSubject();
 
-            RoutePreference preferences = userService.getUserPreferences(auth0UserId);
+            Preferences preferences = userService.getPreferences(auth0UserId);
             if (preferences != null) {
                 return ResponseEntity.ok(preferences);
             } else {
@@ -103,4 +106,29 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
         }
     }
+
+    @PostMapping("/preferences/update")
+    public ResponseEntity<?> updatePreferences(@AuthenticationPrincipal Jwt jwt,
+                                               @RequestBody PreferencesUpdateRequest request) {
+        try {
+            String auth0UserId = jwt.getSubject();
+            userService.updatePreferences(auth0UserId, request);
+            return ResponseEntity.ok("Preferences updated successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update preferences: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/account/update")
+    public ResponseEntity<?> updateAccount(@AuthenticationPrincipal Jwt jwt,
+                                           @RequestBody AccountUpdateRequest request) {
+        try {
+            String auth0UserId = jwt.getSubject();
+            userService.updateAccount(auth0UserId, request);
+            return ResponseEntity.ok("Account updated successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update account: " + e.getMessage());
+        }
+    }
+
 }

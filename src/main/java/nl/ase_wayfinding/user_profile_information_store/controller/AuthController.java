@@ -1,5 +1,6 @@
 package nl.ase_wayfinding.user_profile_information_store.controller;
 
+import nl.ase_wayfinding.user_profile_information_store.model.Preferences;
 import nl.ase_wayfinding.user_profile_information_store.service.Auth0TokenService;
 import nl.ase_wayfinding.user_profile_information_store.service.UserService;
 import nl.ase_wayfinding.user_profile_information_store.model.User;
@@ -167,6 +168,15 @@ public class AuthController {
 
                 // Save the new user to the database
                 userService.save(user);
+            }
+
+            // Ensure default preferences exist
+            if (userService.getPreferences(user.getAuth0UserId()) == null) {
+                Preferences defaultPreferences = new Preferences();
+                defaultPreferences.setAuth0UserId(user.getAuth0UserId());
+                defaultPreferences.setNotificationsEnabled(true);
+                defaultPreferences.setTheme("light"); // default theme
+                userService.savePreferences(defaultPreferences);
             }
 
             // Return success response with token and user details

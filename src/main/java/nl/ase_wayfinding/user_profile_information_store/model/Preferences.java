@@ -3,8 +3,10 @@ package nl.ase_wayfinding.user_profile_information_store.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 @Entity
 @Table(name = "preferences")
 public class Preferences {
@@ -13,7 +15,7 @@ public class Preferences {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long auth0UserId;
+    private String auth0UserId;
 
     private boolean notificationsEnabled;
 
