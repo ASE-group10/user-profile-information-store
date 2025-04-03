@@ -38,6 +38,10 @@ public class UserService {
         return null;
     }
 
+    public User getUserByAuth0Id(String auth0UserId) {
+        return userRepository.findByAuth0UserId(auth0UserId).orElse(null);
+    }
+
     public void savePreferences(Preferences preferences) {
         preferencesRepository.save(preferences);
     }
