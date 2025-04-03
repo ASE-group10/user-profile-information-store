@@ -21,6 +21,8 @@ public class User {
 
     private String picture;
 
+    private String phoneNumber;
+
     @Column(name = "created_at")
     private Timestamp createdAt;
 
@@ -29,6 +31,13 @@ public class User {
 
     // Getters and Setters
 
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
     public Long getId() {
         return id;
     }
