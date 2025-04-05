@@ -250,7 +250,10 @@ public class AuthController {
                             "    \"nickname\": \"john.doe\",\n" +
                             "    \"picture\": \"https://s.gravatar.com/avatar/37c39542b3174ffcaea146e9427f50ea?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2Fbr.png\",\n" +
                             "    \"updated_at\": \"2024-12-05T03:11:53.380Z\",\n" +
-                            "    \"user_id\": \"auth0|675119f9afd09e003e28439b\"\n" +
+                            "    \"user_id\": \"auth0|675119f9afd09e003e28439b\",\n" +
+                            "    \"user_metadata\": {\n" +
+                            "      \"phone_number\": \"+1234567890\"\n" +
+                            "    }\n" +
                             "  }\n" +
                             "}"
                 )
@@ -305,6 +308,10 @@ public class AuthController {
         request.put("password", userDetails.get("password"));
         request.put("connection", "Username-Password-Authentication");
 
+        Map<String, String> userMetadata = new HashMap<>();
+        userMetadata.put("phone_number", userDetails.get("phoneNumber"));
+        request.put("user_metadata", userMetadata);
+
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + tokenService.getManagementApiToken());
         headers.set("Content-Type", "application/json");
@@ -313,10 +320,17 @@ public class AuthController {
             // Send the request to Auth0
             ResponseEntity<Map> response = restTemplate.postForEntity(url, new HttpEntity<>(request, headers), Map.class);
 
+            Map<String, Object> responseBody = response.getBody();
+            // Extract user details from Auth0 response
+            String auth0UserId = (String) responseBody.get("user_id");
+            String email = (String) responseBody.get("email");
+            String phoneNumber = userDetails.get("phoneNumber"); // Get phone from request
+
+
             // Extract response code and response body
             int statusCode = response.getStatusCode().value();
             ObjectMapper objectMapper = new ObjectMapper();
-            Map<String, Object> responseBody = objectMapper.convertValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
+            responseBody = objectMapper.convertValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
 
             // Log the response for debugging
             System.out.println("Auth0 Response Code: " + statusCode);
@@ -324,8 +338,8 @@ public class AuthController {
 
             if (statusCode == 201 || statusCode == 200) {
                 // Extract user details from Auth0 response
-                String auth0UserId = (String) responseBody.get("user_id");
-                String email = (String) responseBody.get("email");
+                auth0UserId = (String) responseBody.get("user_id");
+                email = (String) responseBody.get("email");
                 String picture = (String) responseBody.getOrDefault("picture", null);
                 String createdAt = (String) responseBody.get("created_at");
 
@@ -335,8 +349,8 @@ public class AuthController {
                 user.setEmail(email);
                 user.setName(userDetails.getOrDefault("name", email)); // Use email as fallback for name
                 user.setPicture(picture);
-                user.setPhoneNumber(userDetails.get("phoneNumber"));
-
+                user.setPhoneNumber(phoneNumber); // Set phone number
+                user.setCreatedAt(new Timestamp(System.currentTimeMillis())); // Fallback timestamp
 
                 // Convert createdAt string to Timestamp
                 try {
