@@ -290,6 +290,8 @@ public class AuthController {
                 value = "{\n" +
                         "  \"email\": \"john.doe@mail.com\",\n" +
                         "  \"password\": \"Password@123\"\n" +
+                        "  \"name\": \"John Doe\",\n" +
+                        "  \"phoneNumber\": \"+1234567890\"\n" +
                         "}"
             )
         )
@@ -333,6 +335,8 @@ public class AuthController {
                 user.setEmail(email);
                 user.setName(userDetails.getOrDefault("name", email)); // Use email as fallback for name
                 user.setPicture(picture);
+                user.setPhoneNumber(userDetails.get("phoneNumber"));
+
 
                 // Convert createdAt string to Timestamp
                 try {

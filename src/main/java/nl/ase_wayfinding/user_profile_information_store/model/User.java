@@ -29,4 +29,7 @@ public class User {
     @Column(name = "created_at")
     private Timestamp createdAt;
 
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
 }
