@@ -1,5 +1,6 @@
 package nl.ase_wayfinding.user_profile_information_store.controller;
 
+import nl.ase_wayfinding.user_profile_information_store.model.Preferences;
 import nl.ase_wayfinding.user_profile_information_store.service.Auth0TokenService;
 import nl.ase_wayfinding.user_profile_information_store.service.UserService;
 import nl.ase_wayfinding.user_profile_information_store.model.User;
@@ -169,6 +170,15 @@ public class AuthController {
                 userService.save(user);
             }
 
+            // Ensure default preferences exist
+            if (userService.getPreferences(user.getAuth0UserId()) == null) {
+                Preferences defaultPreferences = new Preferences();
+                defaultPreferences.setAuth0UserId(user.getAuth0UserId());
+                defaultPreferences.setNotificationsEnabled(true);
+                defaultPreferences.setTheme("light"); // default theme
+                userService.savePreferences(defaultPreferences);
+            }
+
             // Return success response with token and user details
             return ResponseEntity.status(statusCode).body(Map.of(
                 "message", "Login successful",
@@ -281,10 +291,11 @@ public class AuthController {
             examples = @ExampleObject(
                 name = "Signup Request Example",
                 value = "{\n" +
-                        "                      \"email\": \"john.doe@mail.com\",\n" +
-                        "                      \"password\": \"Password@123\",\n" +
-                        "                      \"phoneNumber\": \"+1234567890\"\n" +
-                        "                    }"
+                        "  \"email\": \"john.doe@mail.com\",\n" +
+                        "  \"password\": \"Password@123\"\n" +
+                        "  \"name\": \"John Doe\",\n" +
+                        "  \"phoneNumber\": \"+1234567890\"\n" +
+                        "}"
             )
         )
     )    
