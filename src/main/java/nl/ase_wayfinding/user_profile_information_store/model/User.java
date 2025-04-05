@@ -26,8 +26,6 @@ public class User {
 
     private String picture;
 
-    private String phoneNumber;
-
     @Column(name = "created_at")
     private Timestamp createdAt;
 
