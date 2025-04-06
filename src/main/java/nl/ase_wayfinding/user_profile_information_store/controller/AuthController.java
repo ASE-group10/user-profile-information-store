@@ -129,6 +129,7 @@ public class AuthController {
             )
         )
         @RequestBody Map<String, String> credentials) {
+        System.out.println("🔐 Login attempt for: " + credentials.get("email"));
         String url = auth0Domain + "oauth/token";
 
         // Prepare the request payload
@@ -178,6 +179,7 @@ public class AuthController {
                 defaultPreferences.setTheme("light"); // default theme
                 userService.savePreferences(defaultPreferences);
             }
+            System.out.println("✅ Login successful for: " + email);
 
             // Return success response with token and user details
             return ResponseEntity.status(statusCode).body(Map.of(
@@ -191,6 +193,8 @@ public class AuthController {
             // Handle client error exceptions and extract response details
             int errorStatusCode = ex.getStatusCode().value();
             String errorBody = ex.getResponseBodyAsString();
+            System.out.println("❌ Login failed for: " + credentials.get("email"));
+            System.out.println("Details: " + errorBody);
 
             // Parse the errorBody into a Map for JSON structure
             ObjectMapper objectMapper = new ObjectMapper();
@@ -207,6 +211,7 @@ public class AuthController {
                 "details", errorDetails
             ));
         } catch (Exception e) {
+            System.out.println("🔥 Unexpected login error: " + e.getMessage());
             // Handle unexpected errors
             return ResponseEntity.status(500).body(Map.of(
                 "message", "Login failed: An unexpected error occurred",
