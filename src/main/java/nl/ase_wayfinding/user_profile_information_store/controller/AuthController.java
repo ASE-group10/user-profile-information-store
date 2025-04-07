@@ -178,6 +178,8 @@ public class AuthController {
                 user.setAuth0UserId(auth0UserId);
                 user.setEmail(email);
                 user.setName(email); // Use email as the default name if no other info is available
+                user.setPicture("https://cdn.auth0.com/avatars/df.png");
+                user.setPhoneNumber("1234567890"); // Set phone number
                 user.setCreatedAt(new Timestamp(System.currentTimeMillis()));
                 userService.save(user);
             }
