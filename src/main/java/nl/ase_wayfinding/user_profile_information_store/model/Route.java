@@ -11,67 +11,32 @@ public class Route {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long routeId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
-    @Column(name = "source_location", columnDefinition = "jsonb")
-    private String sourceLocation;
-
-    @Column(name = "destination_location", columnDefinition = "jsonb")
-    private String destinationLocation;
-
-    @Column(columnDefinition = "jsonb")
-    private String waypoints;
-
-    private String status = "active";
+    @Column(name = "status")
+    private String status;
 
     @Column(name = "created_at", updatable = false)
     private Timestamp createdAt;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     // Constructors
     public Route() {}
 
-    // Getters and Setters
+    public Route(String status, Timestamp createdAt, User user) {
+        this.status = status;
+        this.createdAt = createdAt;
+        this.user = user;
+    }
 
+    // Getters and Setters
     public Long getRouteId() {
         return routeId;
     }
 
     public void setRouteId(Long routeId) {
         this.routeId = routeId;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-       this.user = user;
-    }
-
-    public String getSourceLocation() {
-        return sourceLocation;
-    }
-
-    public void setSourceLocation(String sourceLocation) {
-        this.sourceLocation = sourceLocation;
-    }
-
-    public String getDestinationLocation() {
-        return destinationLocation;
-    }
-
-    public void setDestinationLocation(String destinationLocation) {
-        this.destinationLocation = destinationLocation;
-    }
-
-    public String getWaypoints() {
-        return waypoints;
-    }
-
-    public void setWaypoints(String waypoints) {
-        this.waypoints = waypoints;
     }
 
     public String getStatus() {
@@ -88,5 +53,13 @@ public class Route {
 
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
