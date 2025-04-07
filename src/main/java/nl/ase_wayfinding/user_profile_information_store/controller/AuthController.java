@@ -130,24 +130,25 @@ public class AuthController {
         )
         @RequestBody Map<String, String> credentials) {
         System.out.println("🔐 Login attempt for: " + credentials.get("email"));
+
         String tokenUrl = auth0Domain + "oauth/token";
         String userInfoUrl = auth0Domain + "userinfo";
 
-        // Prepare the request payload
+        // Prepare the token request (NO audience; add scope=openid)
         Map<String, Object> request = new HashMap<>();
         request.put("grant_type", "password");
         request.put("username", credentials.get("email"));
         request.put("password", credentials.get("password"));
-        request.put("audience", auth0Domain + "api/v2/");
         request.put("client_id", clientId);
         request.put("client_secret", clientSecret);
         request.put("connection", "Username-Password-Authentication");
+        request.put("scope", "openid"); // ✅ Required for /userinfo
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
 
         try {
-            // Send the request to Auth0
+            // 🔐 Step 1: Get access token
             ResponseEntity<Map> response = restTemplate.postForEntity(tokenUrl, new HttpEntity<>(request, headers), Map.class);
 
             // Extract response details
@@ -157,7 +158,7 @@ public class AuthController {
             String accessToken = (String) responseBody.get("access_token");
             String email = credentials.get("email");
 
-            // Call /userinfo to get the user's Auth0 ID
+            // 👤 Step 2: Call /userinfo to get the Auth0 User ID ("sub")
             HttpHeaders userInfoHeaders = new HttpHeaders();
             userInfoHeaders.setBearerAuth(accessToken);
             ResponseEntity<Map> userInfoResponse = restTemplate.exchange(
@@ -169,31 +170,29 @@ public class AuthController {
             Map<String, Object> userInfo = userInfoResponse.getBody();
             String auth0UserId = (String) userInfo.get("sub");
 
-            // Check if the user exists in the local database
+            // 🗂 Step 3: Check if user exists
             User user = userService.findByEmail(email);
             if (user == null) {
-                // Create a new user record in the database
                 user = new User();
                 user.setAuth0UserId(auth0UserId);
                 user.setEmail(email);
                 user.setName(email); // Use email as the default name if no other info is available
                 user.setCreatedAt(new Timestamp(System.currentTimeMillis()));
-
-                // Save the new user to the database
                 userService.save(user);
             }
 
-            // Ensure default preferences exist
+            // ⚙️ Step 4: Create default preferences if needed
             if (userService.getPreferences(user.getAuth0UserId()) == null) {
                 Preferences defaultPreferences = new Preferences();
                 defaultPreferences.setAuth0UserId(user.getAuth0UserId());
                 defaultPreferences.setNotificationsEnabled(true);
-                defaultPreferences.setTheme("light"); // default theme
+                defaultPreferences.setTheme("light");
                 userService.savePreferences(defaultPreferences);
             }
+
             System.out.println("✅ Login successful for: " + email);
 
-            // Return success response with token and user details
+            // 📦 Step 5: Return success with token and user info
             return ResponseEntity.status(statusCode).body(Map.of(
                     "message", "Login successful",
                     "token", accessToken,
