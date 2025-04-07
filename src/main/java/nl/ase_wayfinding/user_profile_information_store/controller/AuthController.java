@@ -130,7 +130,8 @@ public class AuthController {
         )
         @RequestBody Map<String, String> credentials) {
         System.out.println("🔐 Login attempt for: " + credentials.get("email"));
-        String url = auth0Domain + "oauth/token";
+        String tokenUrl = auth0Domain + "oauth/token";
+        String userInfoUrl = auth0Domain + "userinfo";
 
         // Prepare the request payload
         Map<String, Object> request = new HashMap<>();
@@ -147,15 +148,26 @@ public class AuthController {
 
         try {
             // Send the request to Auth0
-            ResponseEntity<Map> response = restTemplate.postForEntity(url, new HttpEntity<>(request, headers), Map.class);
+            ResponseEntity<Map> response = restTemplate.postForEntity(tokenUrl, new HttpEntity<>(request, headers), Map.class);
 
             // Extract response details
             int statusCode = response.getStatusCode().value();
-            ObjectMapper objectMapper = new ObjectMapper();
-            Map<String, Object> responseBody = objectMapper.convertValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
+            Map<String, Object> responseBody = response.getBody();
 
-            String auth0UserId = (String) responseBody.get("auth0_user_id");
+            String accessToken = (String) responseBody.get("access_token");
             String email = credentials.get("email");
+
+            // Call /userinfo to get the user's Auth0 ID
+            HttpHeaders userInfoHeaders = new HttpHeaders();
+            userInfoHeaders.setBearerAuth(accessToken);
+            ResponseEntity<Map> userInfoResponse = restTemplate.exchange(
+                    userInfoUrl,
+                    HttpMethod.GET,
+                    new HttpEntity<>(userInfoHeaders),
+                    Map.class
+            );
+            Map<String, Object> userInfo = userInfoResponse.getBody();
+            String auth0UserId = (String) userInfo.get("sub");
 
             // Check if the user exists in the local database
             User user = userService.findByEmail(email);
@@ -183,11 +195,11 @@ public class AuthController {
 
             // Return success response with token and user details
             return ResponseEntity.status(statusCode).body(Map.of(
-                "message", "Login successful",
-                "token", responseBody.get("access_token"),
-                "auth0_user_id", user.getAuth0UserId(),
-                "expires_in", responseBody.get("expires_in"),
-                "token_type", responseBody.get("token_type")
+                    "message", "Login successful",
+                    "token", accessToken,
+                    "auth0_user_id", user.getAuth0UserId(),
+                    "expires_in", responseBody.get("expires_in"),
+                    "token_type", responseBody.get("token_type")
             ));
         } catch (org.springframework.web.client.HttpClientErrorException ex) {
             // Handle client error exceptions and extract response details
