@@ -139,6 +139,7 @@ public class AuthController {
         request.put("grant_type", "password");
         request.put("username", credentials.get("email"));
         request.put("password", credentials.get("password"));
+        request.put("audience", auth0Domain + "api/v2/");
         request.put("client_id", clientId);
         request.put("client_secret", clientSecret);
         request.put("connection", "Username-Password-Authentication");
