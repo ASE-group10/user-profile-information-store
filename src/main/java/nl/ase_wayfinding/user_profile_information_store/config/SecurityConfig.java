@@ -35,7 +35,10 @@ public class SecurityConfig {
                     "/api/signup",
                     "/api/forgot-password",
                     "/api/logout",
-                    "/api/routes/near-incident",
+                    "/api/routes/start",
+                    "/api/routes/complete",
+                    "/api/routes/nearby-users",
+                    "/api/routes/history",
                     "/error",
                     "/swagger-ui/**", // Allow Swagger UI
                     "/swagger-ui/**",   // Allow Swagger UI
