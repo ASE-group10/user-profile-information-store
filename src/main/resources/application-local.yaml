@@ -60,3 +60,7 @@ pyroscope:
   auth:
     user: ${PYROSCOPE_AUTH_USER:admin}
     password: ${PYROSCOPE_AUTH_PASSWORD:admin123}
+
+service:
+  internal-urls:
+    reward: ${REWARD_SERVICE_INTERNAL_URL}

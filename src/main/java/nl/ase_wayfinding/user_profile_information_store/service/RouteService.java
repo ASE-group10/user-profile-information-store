@@ -14,7 +14,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpHeaders;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -48,6 +53,9 @@ public class RouteService {
 
     @Value("${auth0.domain}")
     private String auth0Domain;
+
+    @Value("${service.internal-urls.reward}")
+    private String rewardServiceUrl;
 
     public JourneyResponse startJourney(StartJourneyRequest startJourneyRequest, HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
@@ -104,40 +112,39 @@ public class RouteService {
                 return new JourneyResponse(null, "Missing Authorization header", null);
             }
 
-            // Extract Auth0 user ID from the token
+            // Extract Auth0 user ID from the token.
             String auth0UserId = TokenUtils.extractAuth0UserIdFromToken(authHeader, auth0Domain);
             if (auth0UserId == null) {
                 return new JourneyResponse(null, "Invalid token", null);
             }
 
-            // Find the user based on Auth0 user ID
+            // Find the user.
             User user = userRepository.findByAuth0UserId(auth0UserId)
                     .orElseThrow(() -> new RuntimeException("User not found for token: " + auth0UserId));
 
-            // Retrieve the route using the routeId from the request payload
+            // Retrieve the route using the routeId provided.
             Long routeId = journeyRequest.getRouteId();
             if (routeId == null) {
                 return new JourneyResponse(null, "Route ID is missing in the request", null);
             }
-
             Route route = routeRepository.findById(routeId)
                     .orElseThrow(() -> new RuntimeException("Route not found for id: " + routeId));
 
-            // Verify that the route belongs to the authenticated user
+            // Verify that the route belongs to the authenticated user.
             if (!route.getUser().getId().equals(user.getId())) {
                 return new JourneyResponse(null, "Unauthorized: Route does not belong to user", null);
             }
 
-            // Update the route status to "completed" and save the updated Route
+            // Mark the route as "completed" and save.
             route.setStatus("completed");
             Route updatedRoute = routeRepository.save(route);
 
-            // Create and populate a RouteHistory record
+            // Create and populate a RouteHistory record.
             RouteHistory routeHistory = new RouteHistory();
             routeHistory.setRoute(updatedRoute);
             routeHistory.setCreatedAt(new Timestamp(System.currentTimeMillis()));
 
-            // Process journey history waypoints to extract source and destination
+            // Process journey history waypoints for source and destination.
             List<JourneyRequest.Waypoint> waypoints = journeyRequest.getJourneyHistory().getWaypoints();
             if (waypoints != null && !waypoints.isEmpty()) {
                 JourneyRequest.Waypoint sourceWp = null;
@@ -160,7 +167,7 @@ public class RouteService {
                 }
             }
 
-            // Create and attach RouteDetail with the journey details
+            // Create and attach RouteDetail with journey details.
             RouteDetail details = new RouteDetail();
             String modesJson = objectMapper.writeValueAsString(journeyRequest.getModesOfTransport());
             details.setModesOfTransport(modesJson);
@@ -170,14 +177,47 @@ public class RouteService {
             details.setTravelledWaypoints(journeyRequest.getTravelledWaypoints());
             routeHistory.setRouteDetail(details);
 
-            // Save the RouteHistory record
-            routeHistoryRepository.save(routeHistory);
+            // Persist (and flush) the RouteHistory so that its ID is generated.
+            routeHistory = routeHistoryRepository.saveAndFlush(routeHistory);
+            // Re-fetch the persistent RouteHistory to ensure it is managed.
+            Long routeHistoryId = routeHistory.getRouteHistoryId();
+            RouteHistory managedRouteHistory = routeHistoryRepository.findById(routeHistoryId)
+                    .orElseThrow(() -> new RuntimeException("RouteHistory not found after flush"));
 
-            // Save journey logs associated with this route history
+            // Call the reward service.
+            double travelledDistanceKm = journeyRequest.getTravelledDistance() / 1000.0;
+            RestTemplate restTemplate = new RestTemplate();
+            String rewardApiUrl = rewardServiceUrl + "/calculate-reward";
+
+            Map<String, Object> routeDetails = new HashMap<>();
+            routeDetails.put("distance", travelledDistanceKm);
+            routeDetails.put("healthCompliant", true);
+
+            Map<String, Object> rewardRequest = new HashMap<>();
+            rewardRequest.put("routeDetails", routeDetails);
+
+            // Prepare headers: content type and forward the Authorization header.
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("Authorization", authHeader);
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(rewardRequest, headers);
+
+            try {
+                ResponseEntity<String> rewardResponse = restTemplate.postForEntity(rewardApiUrl, entity, String.class);
+                if (rewardResponse.getStatusCode().is2xxSuccessful()) {
+                    System.out.println("Reward calculated successfully: " + rewardResponse.getBody());
+                } else {
+                    System.err.println("Failed to calculate reward: " + rewardResponse.getStatusCode());
+                }
+            } catch (Exception e) {
+                System.err.println("Error while calling /calculate-reward: " + e.getMessage());
+            }
+
+            // Save journey logs; use the managed RouteHistory instance for the association.
             for (JourneyRequest.Waypoint wp : journeyRequest.getJourneyHistory().getWaypoints()) {
                 JourneyLog log = new JourneyLog();
-                // Associate the log with the RouteHistory record
-                log.setRoute(routeHistory);
+                // Set the association using the managed RouteHistory.
+                log.setRoute(managedRouteHistory);
                 log.setType(wp.getType());
                 String waypointJson = objectMapper.writeValueAsString(wp.getWaypoint());
                 log.setWaypoint(waypointJson);
@@ -186,13 +226,14 @@ public class RouteService {
                 journeyLogRepository.save(log);
             }
 
-            // Return a consistent response based on the updated Route
+            // Return a successful response.
             return new JourneyResponse(updatedRoute.getRouteId(), "Journey completed successfully", updatedRoute.getStatus());
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return new JourneyResponse(null, "Error processing journey data", null);
         }
     }
+
 
     public NearbyUsersResponse findNearbyUsers(NearbyUsersRequest request) {
         // Convert radius from meters to kilometers
