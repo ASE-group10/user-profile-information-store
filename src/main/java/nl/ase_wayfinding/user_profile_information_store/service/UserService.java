@@ -72,6 +72,10 @@ public class UserService {
             user.setPicture(request.getPicture());
         }
 
+        if (request.getPhoneNumber() != null) {
+            user.setPhoneNumber(request.getPhoneNumber());
+        }
+
         userRepository.save(user);
     }
 
