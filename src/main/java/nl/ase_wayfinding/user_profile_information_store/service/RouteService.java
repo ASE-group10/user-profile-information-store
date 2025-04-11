@@ -44,6 +44,8 @@ public class RouteService {
     @Autowired
     private RouteStartWaypointRepository routeStartWaypointRepository;
 
+    @Autowired
+    private PreferencesRepository preferencesRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -241,16 +243,23 @@ public class RouteService {
         List<RouteStartWaypoint> waypoints = routeStartWaypointRepository.findStartedWaypointsNear(
                 request.getLatitude(), request.getLongitude(), radiusKm);
 
-        // Use a Set to avoid duplicates
+        // Use a Set to avoid duplicate phone numbers
         Set<String> phoneNumbersSet = new HashSet<>();
+
         for (RouteStartWaypoint wp : waypoints) {
             if (wp.getRoute() != null) {
                 User user = wp.getRoute().getUser();
                 if (user != null && user.getPhoneNumber() != null) {
-                    phoneNumbersSet.add(user.getPhoneNumber());
+                    // Retrieve the user's preferences based on their Auth0 user ID
+                    Optional<Preferences> optionalPreferences = preferencesRepository.findByAuth0UserId(user.getAuth0UserId());
+                    // Only add the phone number if preferences exist and notifications are enabled
+                    if (optionalPreferences.isPresent() && optionalPreferences.get().isNotificationsEnabled()) {
+                        phoneNumbersSet.add(user.getPhoneNumber());
+                    }
                 }
             }
         }
+
         List<String> phoneNumbers = new ArrayList<>(phoneNumbersSet);
         return new NearbyUsersResponse(phoneNumbers);
     }
