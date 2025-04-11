@@ -23,8 +23,7 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -223,17 +222,17 @@ public class AuthControllerTest {
 
                 ResponseEntity<Map> signupResponseEntity = new ResponseEntity<>(signupResponse, HttpStatus.CREATED);
                 when(restTemplate.postForEntity(anyString(), any(HttpEntity.class), eq(Map.class)))
-                                .thenReturn(signupResponseEntity);
+                        .thenReturn(signupResponseEntity);
 
-                // Ensure the User object is properly mocked for return
-                User newUser = new User();
-                newUser.setAuth0UserId("auth0|123456789");
-                newUser.setEmail("newuser@example.com");
+                // Simulate that the user does not exist in the database
+                when(userService.findByEmail("newuser@example.com")).thenReturn(null);
 
-                // Use doReturn() for void methods or when you need to chain mocks
-                doReturn(newUser).when(userService).save(any(User.class));
-                // Or if save() returns the saved entity:
-                // when(userService.save(any(User.class))).thenReturn(newUser);
+                // Stub the void save() method to simulate saving by setting an id on the passed User.
+                doAnswer(invocation -> {
+                        User u = invocation.getArgument(0);
+                        u.setId(1L);  // Simulate that the saved user now has an ID
+                        return null;
+                }).when(userService).save(any(User.class));
 
                 // Act
                 ResponseEntity<?> response = authController.signup(userDetails);
@@ -244,10 +243,11 @@ public class AuthControllerTest {
                 @SuppressWarnings("unchecked")
                 Map<String, Object> responseBody = (Map<String, Object>) response.getBody();
                 assertEquals("Signup successful", responseBody.get("message"));
-
-                // Verify user was saved
+                // Verify that a non-null userId has been returned.
+                assertNotNull(responseBody.get("userId"));
                 verify(userService, times(1)).save(any(User.class));
         }
+
 
         @Test
         public void testSignup_UserExists() {

@@ -21,7 +21,8 @@ public class Preferences {
 
     private boolean notificationsEnabled;
 
-    // Adding field to maintain backward compatibility
+    // Mark this field as transient so it is not mapped to a separate column.
+    @Transient
     private boolean notificationEnabled;
 
     // Adding language field to match test expectations
@@ -29,14 +30,15 @@ public class Preferences {
 
     private String theme; // e.g., "dark", "light"
 
-    // Add setter methods that tests are expecting
+    // Setter to keep both fields in sync.
     public void setNotificationEnabled(boolean enabled) {
         this.notificationEnabled = enabled;
-        this.notificationsEnabled = enabled; // Keep both fields in sync
+        this.notificationsEnabled = enabled; // Keep the persistent field in sync.
     }
 
+    // Setter to keep both userId and auth0UserId in sync.
     public void setUserId(String userId) {
         this.userId = userId;
-        this.auth0UserId = userId; // Keep both fields in sync
+        this.auth0UserId = userId;
     }
 }
