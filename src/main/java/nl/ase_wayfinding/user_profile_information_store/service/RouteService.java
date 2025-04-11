@@ -44,6 +44,8 @@ public class RouteService {
     @Autowired
     private RouteStartWaypointRepository routeStartWaypointRepository;
 
+    @Autowired
+    private PreferencesRepository preferencesRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -243,11 +245,15 @@ public class RouteService {
 
         // Use a Set to avoid duplicates
         Set<String> phoneNumbersSet = new HashSet<>();
+
         for (RouteStartWaypoint wp : waypoints) {
             if (wp.getRoute() != null) {
                 User user = wp.getRoute().getUser();
                 if (user != null && user.getPhoneNumber() != null) {
-                    phoneNumbersSet.add(user.getPhoneNumber());
+                    Optional<Preferences> optionalPreferences = preferencesRepository.findByAuth0UserId(user.getAuth0UserId());
+                    if (optionalPreferences.isPresent() && optionalPreferences.get().isNotificationsEnabled()) {
+                        phoneNumbersSet.add(user.getPhoneNumber());
+                    }
                 }
             }
         }
