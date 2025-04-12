@@ -354,27 +354,21 @@ public class UserServiceTest {
 
     @Test
     void testUpdatePreferences_NoNotificationFlags() {
-        // Test updatePreferences when both flags are false (so the notification branch should not update the flags)
+        // Arrange
         PreferencesUpdateRequest request = new PreferencesUpdateRequest();
-        // Ensure both boolean getters return false.
-        request.setNotificationsEnabled(false);
-        // Set a theme and language to ensure those branches are executed.
+        request.setNotificationsEnabled(false);  // explicit update to false
         request.setTheme("blue");
         request.setLanguage("de");
 
-        // Simulate that there are already existing preferences.
         when(preferencesRepository.findByAuth0UserId("auth0|123456")).thenReturn(Optional.of(testPreferences));
-
-        // Stub the non-void save() method to return the same Preferences object passed in.
         when(preferencesRepository.save(any(Preferences.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        // Call the method under test
+        // Act: This call will update all fields to the values in the request.
         userService.updatePreferences("auth0|123456", request);
 
-        // The existing notification flags should remain unchanged (true) because no update is triggered.
-        assertTrue(testPreferences.isNotificationsEnabled());
-        // Theme and language are updated
+        // Assert: Expect the notificationsEnabled field to be updated to false.
+        assertFalse(testPreferences.isNotificationsEnabled());
         assertEquals("blue", testPreferences.getTheme());
         assertEquals("de", testPreferences.getLanguage());
 

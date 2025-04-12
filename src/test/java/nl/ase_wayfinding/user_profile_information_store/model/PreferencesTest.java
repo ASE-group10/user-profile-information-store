@@ -23,21 +23,18 @@ public class PreferencesTest {
 
     @Test
     void testPreferencesGettersAndSetters() {
-        // Create a preferences object
         Preferences preferences = new Preferences();
 
-        // Set values
         preferences.setId(1L);
         preferences.setAuth0UserId("auth0|123456");
-        preferences.setAuth0UserId("user123");
+        // Removed the redundant call with "user123" if not intended.
         preferences.setNotificationsEnabled(true);
         preferences.setLanguage("en");
         preferences.setTheme("dark");
 
-        // Test getters
         assertEquals(1L, preferences.getId());
+        // Expecting only one value for auth0UserId:
         assertEquals("auth0|123456", preferences.getAuth0UserId());
-        assertEquals("user123", preferences.getAuth0UserId());
         assertTrue(preferences.isNotificationsEnabled());
         assertEquals("en", preferences.getLanguage());
         assertEquals("dark", preferences.getTheme());
@@ -47,22 +44,20 @@ public class PreferencesTest {
     void testSyncFields() {
         Preferences preferences = new Preferences();
 
-        // Test syncing notificationEnabled and notificationsEnabled
+        // Test syncing notificationsEnabled and notificationsEnabled (this works fine)
         preferences.setNotificationsEnabled(true);
         assertTrue(preferences.isNotificationsEnabled());
 
         preferences.setNotificationsEnabled(false);
         assertFalse(preferences.isNotificationsEnabled());
 
-        // Test syncing userId and auth0UserId
+        // Test auth0UserId setting (only one value is stored)
         preferences.setAuth0UserId("newUser123");
-        assertEquals("newUser123", preferences.getAuth0UserId());
         assertEquals("newUser123", preferences.getAuth0UserId());
 
         preferences.setAuth0UserId("auth0|789");
+        // Now, expect that getAuth0UserId returns the new value
         assertEquals("auth0|789", preferences.getAuth0UserId());
-        // This doesn't auto-sync when setting auth0UserId directly
-        assertEquals("newUser123", preferences.getAuth0UserId());
     }
 
     @Test

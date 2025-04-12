@@ -13,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -51,13 +52,13 @@ public class UserController {
         Optional<User> optUser = userService.getUserById(auth0UserId);
         if (optUser.isPresent()) {
             User user = optUser.get();
-            return ResponseEntity.ok(Map.of(
-                    "name", user.getName(),
-                    "email", user.getEmail(),
-                    "phoneNumber", user.getPhoneNumber(),
-                    "picture", user.getPicture(),
-                    "createdAt", user.getCreatedAt()
-            ));
+            Map<String, Object> result = new HashMap<>();
+            result.put("name", user.getName());
+            result.put("email", user.getEmail());
+            result.put("phoneNumber", user.getPhoneNumber());
+            result.put("picture", user.getPicture());
+            result.put("createdAt", user.getCreatedAt());
+            return ResponseEntity.ok(result);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
         }
