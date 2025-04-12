@@ -24,7 +24,6 @@ public class PreferencesRepositoryTest {
         // Create and persist test preferences
         Preferences preferences = new Preferences();
         preferences.setAuth0UserId("auth0|123456");
-        preferences.setUserId("auth0|123456");
         preferences.setNotificationsEnabled(true);
         preferences.setLanguage("en");
         preferences.setTheme("light");
@@ -38,7 +37,6 @@ public class PreferencesRepositoryTest {
         assertTrue(foundOptional.isPresent());
         Preferences found = foundOptional.get();
         assertEquals("auth0|123456", found.getAuth0UserId());
-        assertEquals("auth0|123456", found.getUserId());
         assertTrue(found.isNotificationsEnabled());
         assertEquals("en", found.getLanguage());
         assertEquals("light", found.getTheme());

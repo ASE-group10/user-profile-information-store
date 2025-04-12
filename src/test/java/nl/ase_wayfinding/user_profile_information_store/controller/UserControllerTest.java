@@ -45,14 +45,14 @@ public class UserControllerTest {
 
         // Set up test user data
         testUser = new User();
-        testUser.setAuth0Id(testUserId);
+        testUser.setAuth0UserId(testUserId);
         testUser.setEmail("test@example.com");
         testUser.setName("Test User");
 
         // Set up test preferences
         testPreferences = new Preferences();
-        testPreferences.setUserId(testUserId);
-        testPreferences.setNotificationEnabled(true);
+        testPreferences.setAuth0UserId(testUserId);
+        testPreferences.setNotificationsEnabled(true);
         testPreferences.setLanguage("en");
         testPreferences.setTheme("light");
     }
@@ -115,7 +115,7 @@ public class UserControllerTest {
     public void testUpdatePreferences_Success() {
         // Arrange
         PreferencesUpdateRequest request = new PreferencesUpdateRequest();
-        request.setNotificationEnabled(false);
+        request.setNotificationsEnabled(false);
         request.setLanguage("fr");
         request.setTheme("dark");
 
@@ -134,7 +134,7 @@ public class UserControllerTest {
     public void testUpdatePreferences_Error() {
         // Arrange
         PreferencesUpdateRequest request = new PreferencesUpdateRequest();
-        request.setNotificationEnabled(false);
+        request.setNotificationsEnabled(false);
 
         doThrow(new RuntimeException("Database error")).when(userService).updatePreferences(eq(testUserId),
                 any(PreferencesUpdateRequest.class));
@@ -185,7 +185,7 @@ public class UserControllerTest {
     public void testUpdatePreferences_AllFields() {
         // Arrange
         PreferencesUpdateRequest request = new PreferencesUpdateRequest();
-        request.setNotificationEnabled(false);
+        request.setNotificationsEnabled(false);
         request.setLanguage("es");
         request.setTheme("dark");
 

@@ -12,7 +12,7 @@ public class UserTest {
 
         // Set values
         user.setId(1L);
-        user.setAuth0Id("auth0|123456");
+        user.setAuth0UserId("auth0|123456");
         user.setEmail("user@example.com");
         user.setName("Test User");
         user.setPhoneNumber("+1234567890");
@@ -20,7 +20,7 @@ public class UserTest {
 
         // Test getters
         assertEquals(1L, user.getId());
-        assertEquals("auth0|123456", user.getAuth0Id());
+        assertEquals("auth0|123456", user.getAuth0UserId());
         assertEquals("user@example.com", user.getEmail());
         assertEquals("Test User", user.getName());
         assertEquals("+1234567890", user.getPhoneNumber());
@@ -33,7 +33,7 @@ public class UserTest {
 
         // Test default values
         assertNull(user.getId());
-        assertNull(user.getAuth0Id());
+        assertNull(user.getAuth0UserId());
         assertNull(user.getEmail());
         assertNull(user.getName());
         assertNull(user.getPhoneNumber());

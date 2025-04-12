@@ -14,7 +14,7 @@ public class RouteTest {
         Timestamp ts = new Timestamp(System.currentTimeMillis());
         route.setCreatedAt(ts);
         User user = new User();
-        user.setAuth0Id("auth0|1");
+        user.setAuth0UserId("auth0|1");
         route.setUser(user);
 
         assertEquals(1L, route.getRouteId());

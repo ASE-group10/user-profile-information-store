@@ -19,9 +19,6 @@ public class User {
     @Column(name = "auth0_user_id", unique = true, nullable = false)
     private String auth0UserId;
 
-    // Adding auth0Id field to match test expectations
-    private String auth0Id;
-
     @Column(unique = true, nullable = false)
     private String email;
 
@@ -35,9 +32,4 @@ public class User {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    // Add methods that tests are expecting
-    public void setAuth0Id(String auth0Id) {
-        this.auth0Id = auth0Id;
-        this.auth0UserId = auth0Id; // Keep both fields in sync
-    }
 }
