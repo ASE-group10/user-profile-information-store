@@ -94,7 +94,16 @@ public class UserControllerTest {
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(testUser, response.getBody());
+
+        Map<String, Object> expected = new HashMap<>();
+        expected.put("name", testUser.getName());
+        expected.put("email", testUser.getEmail());
+        expected.put("phoneNumber", testUser.getPhoneNumber());
+        expected.put("picture", testUser.getPicture());
+        expected.put("createdAt", testUser.getCreatedAt());
+
+        assertEquals(expected, response.getBody());
+
         verify(userService, times(1)).getUserById(testUserId);
     }
 

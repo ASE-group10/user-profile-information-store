@@ -386,13 +386,12 @@ public class AuthController {
                 // Save the user
                 userService.save(user);
 
+                Map<String, Object> result = new HashMap<>();
+                result.put("message", "Signup successful");
+                result.put("userId", user.getId());
+                result.put("auth0Response", responseBody);
+                return ResponseEntity.ok(result);
 
-                // Return successful response
-                return ResponseEntity.ok(Map.of(
-                    "message", "Signup successful",
-                    "userId", user.getId(),
-                    "auth0Response", responseBody
-                ));
             } else {
                 // Handle unexpected successful codes
                 return ResponseEntity.status(statusCode).body(Map.of(
