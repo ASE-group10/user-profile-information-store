@@ -8,14 +8,12 @@ public class PreferencesUpdateRequestTest {
     @Test
     void testNotificationSync() {
         PreferencesUpdateRequest request = new PreferencesUpdateRequest();
-        request.setNotificationEnabled(true);
+        request.setNotificationsEnabled(true);
 
-        assertTrue(request.isNotificationEnabled());
         assertTrue(request.isNotificationsEnabled());
 
         // Change notificationsEnabled only through setter (if available)
-        request.setNotificationEnabled(false);
-        assertFalse(request.isNotificationEnabled());
+        request.setNotificationsEnabled(false);
         assertFalse(request.isNotificationsEnabled());
     }
 

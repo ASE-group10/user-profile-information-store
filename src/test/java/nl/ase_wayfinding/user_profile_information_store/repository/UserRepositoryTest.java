@@ -25,7 +25,7 @@ public class UserRepositoryTest {
         User user = new User();
         user.setEmail("test@example.com");
         user.setName("Test User");
-        user.setAuth0Id("auth0|123456");
+        user.setAuth0UserId("auth0|123456");
         entityManager.persist(user);
         entityManager.flush();
 
@@ -37,7 +37,7 @@ public class UserRepositoryTest {
         User found = foundOptional.get();
         assertEquals("test@example.com", found.getEmail());
         assertEquals("Test User", found.getName());
-        assertEquals("auth0|123456", found.getAuth0Id());
+        assertEquals("auth0|123456", found.getAuth0UserId());
     }
 
     @Test

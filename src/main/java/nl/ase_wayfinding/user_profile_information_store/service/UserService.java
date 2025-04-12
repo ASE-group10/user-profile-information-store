@@ -67,10 +67,7 @@ public class UserService {
                 });
 
         // Handle both field names for backward compatibility
-        if (request.isNotificationsEnabled() || request.isNotificationEnabled()) {
-            preferences.setNotificationsEnabled(request.isNotificationsEnabled() || request.isNotificationEnabled());
-            preferences.setNotificationEnabled(request.isNotificationsEnabled() || request.isNotificationEnabled());
-        }
+        preferences.setNotificationsEnabled(request.isNotificationsEnabled());
 
         preferences.setTheme(request.getTheme());
 

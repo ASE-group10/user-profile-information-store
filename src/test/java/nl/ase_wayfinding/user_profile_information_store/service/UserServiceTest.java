@@ -40,17 +40,15 @@ public class UserServiceTest {
 
         // Set up test user
         testUser = new User();
-        testUser.setAuth0Id("auth0|123456");
+        testUser.setAuth0UserId("auth0|123456");
         testUser.setEmail("test@example.com");
         testUser.setName("Test User");
 
         // Set up test preferences with initial notifications true
         testPreferences = new Preferences();
-        testPreferences.setUserId("auth0|123456");
+        testPreferences.setAuth0UserId("auth0|123456");
         testPreferences.setAuth0UserId("auth0|123456");
         testPreferences.setNotificationsEnabled(true);
-        // Assume there is a corresponding field for backward compatibility
-        testPreferences.setNotificationEnabled(true);
         testPreferences.setLanguage("en");
         testPreferences.setTheme("light");
     }
@@ -254,7 +252,7 @@ public class UserServiceTest {
     void testUpdatePreferences() {
         // Arrange
         PreferencesUpdateRequest request = new PreferencesUpdateRequest();
-        request.setNotificationEnabled(false);
+        request.setNotificationsEnabled(false);
         request.setLanguage("fr");
         request.setTheme("dark");
 
@@ -275,7 +273,7 @@ public class UserServiceTest {
     void testUpdatePreferences_CreateNew() {
         // Arrange
         PreferencesUpdateRequest request = new PreferencesUpdateRequest();
-        request.setNotificationEnabled(false); // This will not trigger the notifications branch.
+        request.setNotificationsEnabled(false); // This will not trigger the notifications branch.
         request.setTheme("dark");
 
         when(preferencesRepository.findByAuth0UserId("auth0|123456"))
@@ -329,7 +327,7 @@ public class UserServiceTest {
     void testUpdatePreferences_WithNotificationFlags_CreateNew_NonNullLanguage() {
         // Create a request that forces the notifications to be updated
         PreferencesUpdateRequest request = new PreferencesUpdateRequest();
-        request.setNotificationEnabled(true);
+        request.setNotificationsEnabled(true);
         request.setTheme("dark");
         request.setLanguage("it");
 
@@ -347,7 +345,6 @@ public class UserServiceTest {
 
         assertEquals("auth0|123456", savedPref.getAuth0UserId());
         assertTrue(savedPref.isNotificationsEnabled());
-        assertTrue(savedPref.isNotificationEnabled());
         assertEquals("dark", savedPref.getTheme());
         assertEquals("it", savedPref.getLanguage());
 
@@ -360,7 +357,6 @@ public class UserServiceTest {
         // Test updatePreferences when both flags are false (so the notification branch should not update the flags)
         PreferencesUpdateRequest request = new PreferencesUpdateRequest();
         // Ensure both boolean getters return false.
-        request.setNotificationEnabled(false);
         request.setNotificationsEnabled(false);
         // Set a theme and language to ensure those branches are executed.
         request.setTheme("blue");
@@ -378,7 +374,6 @@ public class UserServiceTest {
 
         // The existing notification flags should remain unchanged (true) because no update is triggered.
         assertTrue(testPreferences.isNotificationsEnabled());
-        assertTrue(testPreferences.isNotificationEnabled());
         // Theme and language are updated
         assertEquals("blue", testPreferences.getTheme());
         assertEquals("de", testPreferences.getLanguage());
@@ -409,7 +404,7 @@ public class UserServiceTest {
     void testUpdatePreferences_WithNotificationsTrue_CreateNew() {
         // Arrange: simulate no existing preferences
         PreferencesUpdateRequest request = new PreferencesUpdateRequest();
-        request.setNotificationEnabled(true);
+        request.setNotificationsEnabled(true);
         request.setTheme("dark");
         request.setLanguage("it");
 
@@ -433,7 +428,6 @@ public class UserServiceTest {
         // Assert: verify the new Preferences values
         assertEquals("auth0|123456", savedPref.getAuth0UserId());
         assertTrue(savedPref.isNotificationsEnabled());
-        assertTrue(savedPref.isNotificationEnabled());
         assertEquals("dark", savedPref.getTheme());
         assertEquals("it", savedPref.getLanguage());
         verify(preferencesRepository, times(1)).findByAuth0UserId("auth0|123456");
