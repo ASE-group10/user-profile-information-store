@@ -38,14 +38,25 @@ public class UserService {
         return null;
     }
 
+    // Added to match test expectations
+    public Optional<Preferences> getUserPreferences(String auth0UserId) {
+        Preferences preferences = getPreferences(auth0UserId);
+        return Optional.ofNullable(preferences);
+    }
+
     public User getUserByAuth0Id(String auth0UserId) {
         return userRepository.findByAuth0UserId(auth0UserId).orElse(null);
+    }
+
+    // Added to match test expectations
+    public Optional<User> getUserById(String auth0UserId) {
+        User user = getUserByAuth0Id(auth0UserId);
+        return Optional.ofNullable(user);
     }
 
     public void savePreferences(Preferences preferences) {
         preferencesRepository.save(preferences);
     }
-
 
     public void updatePreferences(String auth0UserId, PreferencesUpdateRequest request) {
         Preferences preferences = preferencesRepository.findByAuth0UserId(auth0UserId)
@@ -55,8 +66,19 @@ public class UserService {
                     return newPref;
                 });
 
-        preferences.setNotificationsEnabled(request.isNotificationsEnabled());
+        // Handle both field names for backward compatibility
+        if (request.isNotificationsEnabled() || request.isNotificationEnabled()) {
+            preferences.setNotificationsEnabled(request.isNotificationsEnabled() || request.isNotificationEnabled());
+            preferences.setNotificationEnabled(request.isNotificationsEnabled() || request.isNotificationEnabled());
+        }
+
         preferences.setTheme(request.getTheme());
+
+        // Handle the language field if present
+        if (request.getLanguage() != null) {
+            preferences.setLanguage(request.getLanguage());
+        }
+
         preferencesRepository.save(preferences);
     }
 
@@ -78,5 +100,4 @@ public class UserService {
 
         userRepository.save(user);
     }
-
 }
