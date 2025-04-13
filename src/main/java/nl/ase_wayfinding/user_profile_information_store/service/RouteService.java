@@ -59,6 +59,9 @@ public class RouteService {
     @Value("${service.internal-urls.reward}")
     private String rewardServiceUrl;
 
+    @Autowired
+    private RestTemplate restTemplate;
+
     public JourneyResponse startJourney(StartJourneyRequest startJourneyRequest, HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || authHeader.isEmpty()) {
@@ -188,7 +191,6 @@ public class RouteService {
 
             // Call the reward service.
             double travelledDistanceKm = journeyRequest.getTravelledDistance() / 1000.0;
-            RestTemplate restTemplate = new RestTemplate();
             String rewardApiUrl = rewardServiceUrl + "/calculate-reward";
 
             Map<String, Object> routeDetails = new HashMap<>();

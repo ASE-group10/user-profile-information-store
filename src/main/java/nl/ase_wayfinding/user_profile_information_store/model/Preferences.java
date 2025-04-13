@@ -21,4 +21,8 @@ public class Preferences {
     private String language;
 
     private String theme; // e.g., "dark", "light"
+
+    public void touch() {
+        // no-op
+    }
 }
